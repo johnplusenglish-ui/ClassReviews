@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocab Homework — Class Exercises</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #f5f0e8;
+    --accent: #c0392b;
+    --accent-light: #e74c3c;
+    --green: #27ae60;
+    --green-light: #d5f5e3;
+    --red-light: #fadbd8;
+    --gold: #d4a017;
+    --muted: #7f8c8d;
+    --card: #fffdf7;
+    --shadow: rgba(26, 26, 46, 0.08);
+    --border: #e0d8cc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .texture {
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23b0a89a' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  header .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.3rem 0.9rem;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.6rem;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+  }
+
+  header p { color: var(--muted); font-size: 0.95rem; }
+
+  /* Progress */
+  .progress-bar {
+    background: var(--border);
+    height: 6px;
+    border-radius: 3px;
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+  .progress-text {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.4rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Navigation tabs */
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .tab-btn {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    background: var(--card);
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .tab-btn:hover { border-color: var(--ink); }
+  .tab-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .tab-btn .tab-score {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    background: var(--green);
+    color: #fff;
+    border-radius: 2px;
+    padding: 0.1rem 0.35rem;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+
+  /* Exercise section */
+  .exercise { display: none; animation: fadeIn 0.35s ease; }
+  .exercise.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .exercise-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.4rem;
+  }
+  .exercise-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+  }
+  .exercise-header .ex-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+  .exercise-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.8rem;
+    max-width: 600px;
+  }
+
+  /* Question card */
+  .q-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    padding: 1.4rem 1.6rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.3s;
+  }
+  .q-card.correct { border-color: var(--green); background: var(--green-light); }
+  .q-card.incorrect { border-color: var(--accent); background: var(--red-light); }
+
+  .q-card .q-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .q-card .q-text {
+    font-size: 1.02rem;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+  }
+  .q-text .blank {
+    display: inline-block;
+    min-width: 120px;
+    border-bottom: 2px dashed var(--muted);
+    margin: 0 0.15rem;
+    text-align: center;
+    color: var(--accent);
+    font-weight: 600;
+    padding: 0 0.3rem;
+  }
+
+  /* Multiple choice */
+  .mc-options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .mc-opt {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.7rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    background: transparent;
+    text-align: left;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--ink);
+    width: 100%;
+  }
+  .mc-opt:hover:not(.disabled) { border-color: var(--ink); background: rgba(26,26,46,0.03); }
+  .mc-opt .mc-letter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .mc-opt.selected .mc-letter { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .mc-opt.correct-answer { border-color: var(--green); background: var(--green-light); }
+  .mc-opt.correct-answer .mc-letter { background: var(--green); color: #fff; border-color: var(--green); }
+  .mc-opt.wrong-answer { border-color: var(--accent); background: var(--red-light); }
+  .mc-opt.disabled { cursor: default; opacity: 0.85; }
+
+  /* Text input */
+  .text-input {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.95rem;
+    padding: 0.65rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    width: 100%;
+    background: transparent;
+    color: var(--ink);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .text-input:focus { border-color: var(--ink); }
+  .text-input:disabled { opacity: 0.7; }
+
+  /* Feedback */
+  .feedback {
+    margin-top: 0.8rem;
+    font-size: 0.88rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 3px;
+    display: none;
+    line-height: 1.5;
+  }
+  .feedback.show { display: block; animation: fadeIn 0.3s ease; }
+  .feedback.correct { background: var(--green-light); color: #1e7e46; }
+  .feedback.incorrect { background: var(--red-light); color: var(--accent); }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 0.8rem; margin-top: 1.8rem; flex-wrap: wrap; }
+  .btn {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 0.65rem 1.6rem;
+    border: 1.5px solid var(--ink);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn.secondary { background: transparent; color: var(--ink); }
+  .btn.secondary:hover { background: var(--ink); color: var(--paper); }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+
+  /* Matching exercise */
+  .match-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width:550px){ .match-container { grid-template-columns: 1fr; } }
+  .match-col-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+  }
+  .match-item {
+    padding: 0.7rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.93rem;
+    background: var(--card);
+  }
+  .match-item:hover:not(.disabled) { border-color: var(--ink); }
+  .match-item.selected { border-color: var(--gold); background: #fef9e7; }
+  .match-item.matched { border-color: var(--green); background: var(--green-light); cursor: default; }
+  .match-item.wrong { border-color: var(--accent); background: var(--red-light); }
+  .match-item.disabled { cursor: default; }
+
+  /* Scoreboard */
+  .scoreboard {
+    background: var(--card);
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    padding: 2rem;
+    text-align: center;
+    margin-top: 2rem;
+    display: none;
+  }
+  .scoreboard.show { display: block; animation: fadeIn 0.4s ease; }
+  .scoreboard h2 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; margin-bottom: 0.3rem; }
+  .scoreboard .big-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 3rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 0.8rem 0;
+  }
+  .scoreboard .big-score.great { color: var(--green); }
+  .scoreboard p { color: var(--muted); font-size: 0.95rem; }
+
+  .vocab-ref {
+    margin-top: 0.3rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="texture"></div>
+<div class="app">
+  <header>
+    <div class="tag">Homework</div>
+    <h1>Vocabulary Workout</h1>
+    <p>Expressions &amp; idioms from today's class</p>
+  </header>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-text" id="progressText">0 / 0 answered</div>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="exerciseContainer"></div>
+  <div class="scoreboard" id="scoreboard">
+    <h2>All Done!</h2>
+    <div class="big-score" id="finalScore">0%</div>
+    <p id="finalMsg"></p>
+  </div>
+</div>
+
+<script>
+const EXERCISES = [
+  {
+    id: "fill",
+    title: "Fill in the Blanks",
+    desc: "Complete each sentence with the correct expression from the box. Type your answer in the field provided.",
+    type: "fill",
+    questions: [
+      { q: "She's very particular about her work — she always ___ quality.", answer: "strives for", hint: "strives for quality" },
+      { q: "I love hanging out with Elena. We always have a ___ when we're together.", answer: "blast", hint: "have a blast / have a ball" },
+      { q: "I know it's not ideal, but we found a ___ that gets the job done.", answer: "workaround", hint: "a workaround" },
+      { q: "Public speaking ___ wonders for your confidence.", answer: "does", hint: "do/does wonders for" },
+      { q: "I wanted to talk about budgets, but let me use that as a ___ into the marketing plan.", answer: "segue", hint: "a segue into sth" },
+      { q: "That's ___ the best restaurant in town — no question about it.", answer: "hands down", hint: "hands down" },
+      { q: "If we want to succeed, we need to ___ the power of AI, not fear it.", answer: "harness", hint: "to harness" },
+      { q: "Good parenting should ___ creativity, not ___ it.", answer: "foster, stifle", hint: "to foster / to stifle" }
+    ]
+  },
+  {
+    id: "mc",
+    title: "Multiple Choice",
+    desc: "Choose the best option to complete each sentence or match the meaning.",
+    type: "mc",
+    questions: [
+      {
+        q: "\"That's just my two cents, for what it's worth.\" What is the speaker doing?",
+        options: ["Making a strong demand", "Offering a humble opinion", "Asking for money", "Refusing to help"],
+        correct: 1
+      },
+      {
+        q: "\"Let's agree to disagree.\" When would you use this?",
+        options: ["When you want to start an argument", "When you've reached a compromise", "When neither side will change their mind and you want to move on", "When you fully agree with someone"],
+        correct: 2
+      },
+      {
+        q: "\"Picking up on what the girls have said, I think we should…\" This phrase is used to:",
+        options: ["Disagree with what was said", "Build on or continue from a previous point", "Interrupt someone mid-sentence", "Change the subject entirely"],
+        correct: 1
+      },
+      {
+        q: "\"I can't help but use it\" means:",
+        options: ["I need someone to help me use it", "I refuse to use it", "I use it automatically / I can't stop myself from using it", "I'm not allowed to use it"],
+        correct: 2
+      },
+      {
+        q: "\"She's got a flair for vocab and idioms.\" A 'flair for' something means:",
+        options: ["A strong dislike of", "A natural talent or ability for", "A fear of", "A formal qualification in"],
+        correct: 1
+      },
+      {
+        q: "What does 'push back on something' mean?",
+        options: ["Physically move something", "Accept it immediately", "Resist or challenge it", "Postpone it"],
+        correct: 2
+      }
+    ]
+  },
+  {
+    id: "match",
+    title: "Match Up",
+    desc: "Match each expression on the left with its meaning or synonym on the right.",
+    type: "match",
+    pairs: [
+      { left: "dig a little deeper", right: "Investigate / explore further" },
+      { left: "hands down", right: "Without a doubt" },
+      { left: "a confidant", right: "Someone you trust with secrets" },
+      { left: "unbiased", right: "Fair and impartial" },
+      { left: "hedging", right: "Softening a statement to be less direct" },
+      { left: "let's narrow it down", right: "Reduce the options / focus" },
+      { left: "you name it", right: "Everything you can think of" },
+      { left: "a professional trade", right: "A skilled occupation / craft" }
+    ]
+  },
+  {
+    id: "context",
+    title: "Use It Right",
+    desc: "Choose the sentence in which the expression is used correctly.",
+    type: "mc",
+    questions: [
+      {
+        q: "Which sentence uses <strong>\"do wonders for\"</strong> correctly?",
+        options: [
+          "A good night's sleep does wonders for your productivity.",
+          "I need to do wonders to the supermarket.",
+          "She did wonders from the meeting early.",
+          "He does wonders at the bus stop every morning."
+        ],
+        correct: 0
+      },
+      {
+        q: "Which sentence uses <strong>\"foster\"</strong> correctly?",
+        options: [
+          "We need to foster the old computer — it's broken.",
+          "The school fosters creativity through art and music programmes.",
+          "I fostered my keys on the table.",
+          "She fostered the door shut."
+        ],
+        correct: 1
+      },
+      {
+        q: "Which sentence uses <strong>\"stifle\"</strong> correctly?",
+        options: [
+          "Let me stifle you to the airport.",
+          "Too many rules can stifle innovation.",
+          "He stifled a delicious cake for the party.",
+          "We stifled through the park."
+        ],
+        correct: 1
+      },
+      {
+        q: "Which sentence uses <strong>\"a segue\"</strong> correctly?",
+        options: [
+          "I segued my bicycle to work.",
+          "That's a nice segue — from climate change to energy policy.",
+          "She segued the jar open.",
+          "They segued a new building downtown."
+        ],
+        correct: 1
+      },
+      {
+        q: "Which sentence uses <strong>\"harness\"</strong> correctly?",
+        options: [
+          "She harnessed her jacket before leaving.",
+          "Can you harness the window? It's cold.",
+          "Companies are learning to harness data to improve services.",
+          "I harnessed at the restaurant for two hours."
+        ],
+        correct: 2
+      }
+    ]
+  }
+];
+
+let state = {
+  scores: {},
+  answered: {},
+  totalQs: 0,
+  answeredCount: 0,
+  matchState: { selectedLeft: null, selectedRight: null, matched: [] }
+};
+
+function init() {
+  // Count total
+  let total = 0;
+  EXERCISES.forEach(ex => {
+    if (ex.type === 'match') total += ex.pairs.length;
+    else total += ex.questions.length;
+    state.scores[ex.id] = { correct: 0, total: ex.type === 'match' ? ex.pairs.length : ex.questions.length };
+    state.answered[ex.id] = {};
+  });
+  state.totalQs = total;
+
+  renderTabs();
+  renderExercises();
+  showExercise(EXERCISES[0].id);
+  updateProgress();
+}
+
+function renderTabs() {
+  const container = document.getElementById('tabs');
+  container.innerHTML = EXERCISES.map(ex =>
+    `<button class="tab-btn" data-id="${ex.id}" onclick="showExercise('${ex.id}')">
+      ${ex.title}<span class="tab-score" id="tabScore_${ex.id}" style="display:none">0/${state.scores[ex.id].total}</span>
+    </button>`
+  ).join('');
+}
+
+function showExercise(id) {
+  document.querySelectorAll('.exercise').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('ex_' + id).classList.add('active');
+  document.querySelector(`.tab-btn[data-id="${id}"]`).classList.add('active');
+}
+
+function renderExercises() {
+  const container = document.getElementById('exerciseContainer');
+  container.innerHTML = EXERCISES.map((ex, ei) => {
+    let inner = '';
+    if (ex.type === 'fill') inner = renderFill(ex, ei);
+    else if (ex.type === 'mc') inner = renderMC(ex, ei);
+    else if (ex.type === 'match') inner = renderMatch(ex, ei);
+    return `<div class="exercise" id="ex_${ex.id}">
+      <div class="exercise-header">
+        <h2>${ex.title}</h2>
+        <span class="ex-num">Ex. ${ei + 1}</span>
+      </div>
+      <p class="exercise-desc">${ex.desc}</p>
+      ${inner}
+    </div>`;
+  }).join('');
+}
+
+function renderFill(ex, ei) {
+  return ex.questions.map((q, qi) => `
+    <div class="q-card" id="card_${ex.id}_${qi}">
+      <div class="q-label">Q${qi + 1}</div>
+      <div class="q-text">${q.q.replace('___', '<span class="blank" id="blank_${ex.id}_${qi}">&nbsp;</span>').replace('___ it', '<span class="blank" id="blank2_${ex.id}_${qi}">&nbsp;</span> it')}</div>
+      <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap">
+        <input class="text-input" style="flex:1;min-width:180px" type="text" id="input_${ex.id}_${qi}" placeholder="Type your answer…"
+          onkeydown="if(event.key==='Enter')checkFill('${ex.id}',${qi})">
+        <button class="btn" onclick="checkFill('${ex.id}',${qi})">Check</button>
+      </div>
+      <div class="feedback" id="fb_${ex.id}_${qi}"></div>
+      <div class="vocab-ref">Hint: ${q.hint}</div>
+    </div>
+  `).join('');
+}
+
+function renderMC(ex, ei) {
+  const letters = ['A','B','C','D'];
+  return ex.questions.map((q, qi) => `
+    <div class="q-card" id="card_${ex.id}_${qi}">
+      <div class="q-label">Q${qi + 1}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="mc-options">
+        ${q.options.map((opt, oi) => `
+          <button class="mc-opt" id="opt_${ex.id}_${qi}_${oi}" onclick="checkMC('${ex.id}',${qi},${oi})">
+            <span class="mc-letter">${letters[oi]}</span>
+            <span>${opt}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="feedback" id="fb_${ex.id}_${qi}"></div>
+    </div>
+  `).join('');
+}
+
+function renderMatch(ex, ei) {
+  const shuffledRight = [...ex.pairs].map((p, i) => ({ text: p.right, idx: i }));
+  for (let i = shuffledRight.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledRight[i], shuffledRight[j]] = [shuffledRight[j], shuffledRight[i]];
+  }
+  window._matchRight = shuffledRight;
+
+  return `<div class="match-container">
+    <div>
+      <div class="match-col-title">Expression</div>
+      ${ex.pairs.map((p, i) => `<div class="match-item match-left" id="ml_${i}" onclick="selectMatch('left',${i})">${p.left}</div>`).join('')}
+    </div>
+    <div>
+      <div class="match-col-title">Meaning</div>
+      ${shuffledRight.map((p, i) => `<div class="match-item match-right" id="mr_${i}" data-idx="${p.idx}" onclick="selectMatch('right',${i})">${p.text}</div>`).join('')}
+    </div>
+  </div>
+  <div class="feedback" id="fb_match" style="margin-top:1rem"></div>`;
+}
+
+function checkFill(exId, qi) {
+  if (state.answered[exId][qi] !== undefined) return;
+  const ex = EXERCISES.find(e => e.id === exId);
+  const q = ex.questions[qi];
+  const input = document.getElementById(`input_${exId}_${qi}`);
+  const val = input.value.trim().toLowerCase();
+  const answers = q.answer.toLowerCase().split(', ');
+  const fb = document.getElementById(`fb_${exId}_${qi}`);
+  const card = document.getElementById(`card_${exId}_${qi}`);
+
+  let correct = false;
+  if (answers.length === 1) {
+    correct = val === answers[0];
+  } else {
+    // Multi-word answer like "foster, stifle"
+    const parts = val.split(/[,\/;]+/).map(s => s.trim());
+    correct = answers.every(a => parts.includes(a));
+  }
+
+  state.answered[exId][qi] = correct;
+  if (correct) state.scores[exId].correct++;
+  state.answeredCount++;
+
+  card.classList.add(correct ? 'correct' : 'incorrect');
+  fb.className = `feedback show ${correct ? 'correct' : 'incorrect'}`;
+  fb.textContent = correct ? '✓ Correct!' : `✗ The answer is: ${q.answer}`;
+  input.disabled = true;
+  updateProgress();
+  updateTabScore(exId);
+}
+
+function checkMC(exId, qi, oi) {
+  if (state.answered[exId][qi] !== undefined) return;
+  const ex = EXERCISES.find(e => e.id === exId);
+  const q = ex.questions[qi];
+  const correct = oi === q.correct;
+
+  state.answered[exId][qi] = correct;
+  if (correct) state.scores[exId].correct++;
+  state.answeredCount++;
+
+  // Disable all options
+  q.options.forEach((_, i) => {
+    const el = document.getElementById(`opt_${exId}_${qi}_${i}`);
+    el.classList.add('disabled');
+    if (i === q.correct) el.classList.add('correct-answer');
+    if (i === oi && !correct) el.classList.add('wrong-answer');
+  });
+
+  const fb = document.getElementById(`fb_${exId}_${qi}`);
+  fb.className = `feedback show ${correct ? 'correct' : 'incorrect'}`;
+  fb.textContent = correct ? '✓ Correct!' : `✗ Not quite. The correct answer is highlighted above.`;
+  updateProgress();
+  updateTabScore(exId);
+}
+
+function selectMatch(side, idx) {
+  const ms = state.matchState;
+  if (ms.matched.includes(idx) && side === 'left') return;
+
+  // Check if right side item is already matched
+  if (side === 'right') {
+    const rightIdx = parseInt(document.getElementById(`mr_${idx}`).dataset.idx);
+    if (ms.matched.includes(rightIdx)) return;
+  }
+
+  if (side === 'left') {
+    if (ms.selectedLeft !== null) document.getElementById(`ml_${ms.selectedLeft}`).classList.remove('selected');
+    ms.selectedLeft = idx;
+    document.getElementById(`ml_${idx}`).classList.add('selected');
+  } else {
+    if (ms.selectedRight !== null) document.getElementById(`mr_${ms.selectedRight}`).classList.remove('selected');
+    ms.selectedRight = idx;
+    document.getElementById(`mr_${idx}`).classList.add('selected');
+  }
+
+  if (ms.selectedLeft !== null && ms.selectedRight !== null) {
+    const rightOrigIdx = parseInt(document.getElementById(`mr_${ms.selectedRight}`).dataset.idx);
+    const correct = ms.selectedLeft === rightOrigIdx;
+    const exId = 'match';
+
+    if (correct) {
+      ms.matched.push(ms.selectedLeft);
+      document.getElementById(`ml_${ms.selectedLeft}`).classList.remove('selected');
+      document.getElementById(`ml_${ms.selectedLeft}`).classList.add('matched', 'disabled');
+      document.getElementById(`mr_${ms.selectedRight}`).classList.remove('selected');
+      document.getElementById(`mr_${ms.selectedRight}`).classList.add('matched', 'disabled');
+      state.scores[exId].correct++;
+      state.answeredCount++;
+
+      const fb = document.getElementById('fb_match');
+      fb.className = 'feedback show correct';
+      fb.textContent = `✓ Matched! (${ms.matched.length}/${EXERCISES.find(e=>e.id===exId).pairs.length})`;
+    } else {
+      document.getElementById(`ml_${ms.selectedLeft}`).classList.add('wrong');
+      document.getElementById(`mr_${ms.selectedRight}`).classList.add('wrong');
+      state.answeredCount++;
+
+      const fb = document.getElementById('fb_match');
+      fb.className = 'feedback show incorrect';
+      fb.textContent = '✗ Not a match. Try again!';
+
+      setTimeout(() => {
+        document.getElementById(`ml_${ms.selectedLeft}`).classList.remove('wrong', 'selected');
+        document.getElementById(`mr_${ms.selectedRight}`).classList.remove('wrong', 'selected');
+        ms.selectedLeft = null;
+        ms.selectedRight = null;
+      }, 700);
+      updateProgress();
+      updateTabScore(exId);
+      return;
+    }
+
+    ms.selectedLeft = null;
+    ms.selectedRight = null;
+    updateProgress();
+    updateTabScore(exId);
+  }
+}
+
+function updateProgress() {
+  let totalCorrect = 0, totalAnswered = 0, totalQs = 0;
+  EXERCISES.forEach(ex => {
+    totalCorrect += state.scores[ex.id].correct;
+    totalQs += state.scores[ex.id].total;
+    if (ex.type === 'match') {
+      totalAnswered += state.matchState.matched.length;
+    } else {
+      totalAnswered += Object.keys(state.answered[ex.id]).length;
+    }
+  });
+
+  const pct = totalQs > 0 ? Math.round((totalAnswered / totalQs) * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${totalAnswered} / ${totalQs} answered`;
+
+  if (totalAnswered === totalQs && totalQs > 0) showFinalScore(totalCorrect, totalQs);
+}
+
+function updateTabScore(exId) {
+  const el = document.getElementById(`tabScore_${exId}`);
+  el.textContent = `${state.scores[exId].correct}/${state.scores[exId].total}`;
+  el.style.display = 'inline-block';
+}
+
+function showFinalScore(correct, total) {
+  const pct = Math.round((correct / total) * 100);
+  const sb = document.getElementById('scoreboard');
+  const scoreEl = document.getElementById('finalScore');
+  const msgEl = document.getElementById('finalMsg');
+
+  scoreEl.textContent = pct + '%';
+  scoreEl.className = 'big-score' + (pct >= 70 ? ' great' : '');
+
+  if (pct === 100) msgEl.textContent = 'Perfect score! Outstanding work. 🎉';
+  else if (pct >= 80) msgEl.textContent = 'Great job! Just a few to review.';
+  else if (pct >= 60) msgEl.textContent = 'Good effort. Review the red items and try again.';
+  else msgEl.textContent = 'Keep practising — you\'ll get there!';
+
+  sb.classList.add('show');
+}
+
+init();
+</script>
+</body>
+</html>
